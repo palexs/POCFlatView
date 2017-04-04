@@ -1,0 +1,3 @@
+rootProject.name = 'POCTest4'
+
+include ':app'
