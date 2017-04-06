@@ -4,13 +4,17 @@ import React, {
 
 import {
   View,
+  Text,
   FlatList,
   ScrollView,
+  TouchableOpacity,
   StyleSheet,
 } from 'react-native';
 
 import Column from './Column';
 import { firstColumnData, listData } from './data';
+
+import _ from 'lodash';
 
 const styles = StyleSheet.create({
   container: {
@@ -21,14 +25,55 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
   },
+  showHideButton: {
+    margin: 5,
+    width: 100,
+    borderColor: 'red',
+    borderWidth: 1,
+    alignSelf: 'center',
+  },
+  showHideButtonTitle: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });
 
 export default class App extends Component {
 
-  renderItem({ item, index }) {
+  constructor(props) {
+    super(props);
+
+    this.state = { showRow: false, firstColumnData, listData };
+  }
+
+  renderItem = ({ item, index }) => {
     return (
       <Column key={index} data={item} />
     );
+  }
+
+  onShowHide = () => {
+    if (!this.state.showRow) {
+      const filteredFirstColumnData = [...firstColumnData];
+      filteredFirstColumnData.splice(1, 1);
+      const filteredListData = [];
+      for (const arr of listData) {
+        const filteredArr = [...arr];
+        filteredArr.splice(1, 1);
+        filteredListData.push(filteredArr);
+      }
+      this.setState({
+        firstColumnData: filteredFirstColumnData,
+        listData: filteredListData,
+      });
+    } else {
+      this.setState({
+        firstColumnData,
+        listData,
+      });
+    }
+
+    this.setState({ showRow: !this.state.showRow });
   }
 
   render() {
@@ -37,10 +82,16 @@ export default class App extends Component {
          <ScrollView
           bounces={false}
          >
+            <TouchableOpacity
+              style={styles.showHideButton}
+              onPress={this.onShowHide}
+            >
+              <Text style={styles.showHideButtonTitle}>Show/Hide</Text>
+            </TouchableOpacity>
            <View style={styles.innerContainer}>
-             <Column data={firstColumnData} />
+             <Column data={this.state.firstColumnData} />
              <FlatList
-               data={listData}
+               data={this.state.listData}
                horizontal
                bounces={false}
                showsVerticalScrollIndicator={false}
